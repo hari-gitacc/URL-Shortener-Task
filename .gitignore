@@ -1,5 +1,7 @@
+# Ignore node modules
 node_modules/
 
-.env
-
-.vscode
+# Ignore build files
+dist/
+build/
+.env/
