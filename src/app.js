@@ -47,6 +47,8 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
+
+
 mongoose.connect(process.env.MONGODB_URI, {
 
   serverSelectionTimeoutMS: 5000 // Timeout after 5s 

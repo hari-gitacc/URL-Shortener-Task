@@ -8,7 +8,7 @@
  *     description: |
  *       **Note:** This endpoint requires browser interaction.
  *       To authenticate:
- *       1. Visit https://url-shortener-task-production.up.railway.app/api/auth/google in your browser
+ *       1. Visit https://url-shortener-jjly.onrender.com/api/auth/google in your browser
  *       2. Complete Google sign-in
  *       3. Receive JWT token in callback response
  *     responses:
