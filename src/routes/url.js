@@ -41,7 +41,7 @@
  *     description: |
  *       **Note:** This endpoint requires browser interaction.
  *       To test:
- *       1. Copy the short URL (http://localhost:3000/api/shorten/your-alias)
+ *       1. Copy the short URL (https://url-shortener-task-production.up.railway.app/api/shorten/your-alias)
  *       2. Open in a browser to be redirected to the original URL
  *       3. Analytics will be tracked automatically
  *     parameters:

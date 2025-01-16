@@ -1,4 +1,5 @@
 const swaggerJSDoc = require("swagger-jsdoc");
+const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
 
 const swaggerOptions = {
     definition: {
@@ -14,9 +15,11 @@ const swaggerOptions = {
         },
         servers: [
             {
-                url: 'http://localhost:3000',
-                description: 'Development server'
-            }
+                url: baseUrl,
+                description: baseUrl.includes('localhost')
+                  ? 'Development server'
+                  : 'Production server'
+              }
         ],
         tags: [
             {
