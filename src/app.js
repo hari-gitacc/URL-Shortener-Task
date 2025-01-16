@@ -80,23 +80,30 @@ app.use(passport.session());
 require('./config/passport');
 
 // Routes
+app.get('/', (req, res) => {
+  res.send(`
+    <h1>Welcome to the URL-shortener API</h1>
+    <p>To view the API documentation, please visit <a href="/api-docs">/api-docs</a>.</p>
+  `);
+});
+
 app.use('/api/auth', authRoutes);
 app.use('/api/shorten', urlRoutes);
 app.use('/api/analytics', analyticsRoutes);
 
-// app.delete('/delete-all', async (req, res) => {
-//   try {
-//     const resultAnalytics = await analytics.deleteMany({});
-//     const resultUrl = await url.deleteMany({});
-//     res.json({
-//       message: 'Documents deleted successfully',
-//       analyticsDeleted: resultAnalytics.deletedCount,
-//       urlDeleted: resultUrl.deletedCount
-//     });
-//   } catch (error) {
-//     res.status(500).send('Error deleting documents: ' + error.message);
-//   }
-// });
+app.delete('/delete-all', async (req, res) => {
+  try {
+    const resultAnalytics = await analytics.deleteMany({});
+    const resultUrl = await url.deleteMany({});
+    res.json({
+      message: 'Documents deleted successfully',
+      analyticsDeleted: resultAnalytics.deletedCount,
+      urlDeleted: resultUrl.deletedCount
+    });
+  } catch (error) {
+    res.status(500).send('Error deleting documents: ' + error.message);
+  }
+});
 
 // Error handling middleware
 app.use((err, req, res, next) => {
