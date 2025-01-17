@@ -12,7 +12,7 @@ class RedisManager {
         url: `redis://${process.env.REDIS_HOST}`
       };
 
-      if (process.env.NODE_ENV !== 'production') {
+      if (process.env.NODE_ENV !== 'development') {
         config.password = process.env.REDIS_PASSWORD;
       }
 

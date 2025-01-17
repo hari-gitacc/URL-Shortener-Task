@@ -17,11 +17,18 @@ const analyticsSchema = new mongoose.Schema({
   os: String,
   browser: String,
   location: {
-    country: String,
-    city: String,
-    region: String,
-    timezone: String,
-    ll: [Number] // [latitude, longitude]
+    ip: String,
+    country_code: String,
+    country_name: String,
+    region_name: String,
+    city_name: String,
+    latitude: Number,
+    longitude: Number,
+    zip_code: String,
+    time_zone: String,
+    asn: String,
+    as: String,
+    is_proxy: Boolean
   }
 });
 
