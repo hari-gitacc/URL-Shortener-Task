@@ -17,3 +17,4 @@ EXPOSE 3000
 
 # Default command (will be overridden by docker-compose in development)
 CMD ["npm", "start"]
+

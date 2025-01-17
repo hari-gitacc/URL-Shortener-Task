@@ -1,10 +1,6 @@
 const https = require("https");
 
-/**
- * Retrieve geo location data for a given IP address using the IP2Location API.
- * @param {string} ip - The IP address to look up.
- * @returns {Promise<Object>} - A promise that resolves to the location data.
- */
+
 function getLocationFromIP(ip) {
   return new Promise((resolve, reject) => {
     const BASE_URL = "https://api.ip2location.io/";

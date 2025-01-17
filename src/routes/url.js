@@ -63,14 +63,15 @@ const router = express.Router();
 const urlController = require('../controllers/url');
 const auth = require('../middleware/auth');
 const { createUrlLimiter, burstLimiter } = require('../middleware/rateLimit');
+const { validateUrlInput } = require('../middleware/validation');
 
 router.post('/', 
-  auth, 
-  createUrlLimiter,
-  burstLimiter, // Optional: Add burst protection
-  urlController.createShortUrl
+    auth, 
+    validateUrlInput,
+    createUrlLimiter,
+    burstLimiter,
+    urlController.createShortUrl
 );
-
 router.get('/:alias', urlController.redirectToLongUrl);
 
 module.exports = router;

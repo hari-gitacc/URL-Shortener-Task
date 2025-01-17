@@ -4,40 +4,34 @@ const cacheService = require('../services/cache');
 const analyticsController = require('./analytics');
 
 const urlController = {
-    createShortUrl: async (req, res) => {
-        try {
-            const { longUrl, customAlias, topic } = req.body;
-            const userEmail = req.user.email;
-            console.log(userEmail, 'userEmail');
-            
+createShortUrl: async (req, res) => {
+    try {
+        const { longUrl, customAlias, topic } = req.body;
+        const userEmail = req.user.email;
 
-            if (!longUrl) {
-                return res.status(400).json({ error: 'Long URL is required' });
-            }
+        // URL creation logic
+        const url = await urlService.createShortUrl(
+            userEmail,
+            longUrl,
+            customAlias,
+            topic
+        );
 
-            const url = await urlService.createShortUrl(
-                userEmail,
-                longUrl,
-                customAlias,
-                topic
-            );
+        // Cache the new URL
+        await cacheService.set(`url:${url.shortUrl}`, url);
 
-            // Cache the new URL
-            await cacheService.set(`url:${url.shortUrl}`, url);
-
-            res.status(201).json({
-                shortUrl: url.shortUrl,
-                createdAt: url.createdAt
-            });
-        } catch (error) {
-            if (error.message === 'Custom alias already in use') {
-                return res.status(409).json({ error: error.message });
-            }
-            console.log(error);
-            
-            res.status(500).json({ error: 'Error creating short URL' });
+        res.status(201).json({
+            shortUrl: url.shortUrl,
+            createdAt: url.createdAt
+        });
+    } catch (error) {
+        if (error.message === 'Custom alias already in use') {
+            return res.status(409).json({ error: error.message });
         }
-    },
+        console.error('Error creating short URL:', error);
+        res.status(500).json({ error: 'Error creating short URL' });
+    }
+},
 
     // In your redirectToLongUrl function:
     redirectToLongUrl: async (req, res) => {
