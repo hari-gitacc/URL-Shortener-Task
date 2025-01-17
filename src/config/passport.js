@@ -23,10 +23,8 @@ passport.use(new GoogleStrategy({
   },
   async function(accessToken, refreshToken, profile, done) {
     try {
-      console.log(`${process.env.BASE_URL}/api/auth/google/callback`);
       
       let user = await User.findOne({ googleId: profile.id });
-      console.log(accessToken, refreshToken, profile);
       
       if (!user) {
         user = await User.create({

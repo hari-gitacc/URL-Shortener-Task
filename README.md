@@ -1,3 +1,5 @@
+Here's your enhanced README.md with clearer local development instructions and better formatting:
+
 ```markdown
 # Advanced URL Shortener with Analytics
 
@@ -37,94 +39,86 @@ A scalable URL shortening service with comprehensive analytics, custom aliases, 
 
 ## Setup Instructions
 
-You can run this project in two ways:
-
-### Option 1: Using Docker (Recommended)
-
-**Prerequisites:**
+### Prerequisites
 - Docker Desktop
 - Git
+- Node.js (v18+) [for non-Docker setup]
 
-**Steps:**
+### Option 1: Docker Setup (Recommended)
 
+#### Development Environment
 ```bash
-# 1. Clone the repository
+# Clone the repository
 git clone https://github.com/hari-gitacc/URL-Shortener-Task.git
 
-# 2. Setup environment variables
+# Navigate to project directory
+cd URL-Shortener-Task
+
+# Copy environment variables
 cp .env.example .env
 # Edit .env with your credentials
 
-# 3. Start with Docker
-docker-compose up
+# Start development environment
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
 
 # To stop the containers
 docker-compose down
 
-# To rebuild (if package.json changes)
-docker-compose up --build
+# Rebuild containers (if dependencies change)
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build
 ```
 
-### Option 2: Traditional Setup
+#### Production Environment
+```bash
+# Start production environment
+docker-compose up
 
-**Prerequisites:**
-- Node.js (v18+)
-- MongoDB
-- Redis
-- Google OAuth credentials
+# Stop production environment
+docker-compose down
+```
 
-**Steps:**
+### Option 2: Local Setup (Without Docker)
 
 ```bash
-# 1. Clone the repository
-git clone <your-repo-url>
+# Clone the repository
+git clone https://github.com/hari-gitacc/URL-Shortener-Task.git
 
-# 2. Install dependencies
+# Navigate to project directory
+cd URL-Shortener-Task
+
+# Install dependencies
 npm install
 
-# 3. Setup environment variables
+# Copy environment variables
 cp .env.example .env
 # Edit .env with your credentials
 
-# 4. Start the development server
+# Start development server
 npm run dev
+
+# Start production server
+npm start
 ```
 
 ## Environment Variables
 
-Copy `.env.example` to `.env` and update the following variables:
+Create `.env` file from `.env.example`:
 
 ```env
 MONGODB_URI=your_mongodb_uri
 REDIS_HOST=your_redis_host
+REDIS_PORT=6379
+PORT=3000
 GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
 JWT_SECRET=your_jwt_secret
 BASE_URL=your_base_url
+SESSION_SECRET=your_session_secret
 ```
-
-## Deployment Details
-
-### Docker Configuration
-
-The application uses three containerized services:
-- **Node.js Application:** API server
-- **MongoDB:** Database
-- **Redis:** Caching & Rate Limiting
-
-## Deployment Details
-
-### Production Deployment
-Currently deployed on Render:
-- Containerized using Docker
-- URL: [URL Shortener](https://url-shortener-jjly.onrender.com)
-- Environment: Production
-- Database: MongoDB Atlas (External)
-- Cache: Redis Cloud (External)
 
 ## API Documentation
 
-Access the API documentation at `https://url-shortener-jjly.onrender.com/api-docs` when running the server.
+Access the API documentation at `/api-docs` when running the server.
 
 ### Key Endpoints
 
@@ -136,16 +130,36 @@ Access the API documentation at `https://url-shortener-jjly.onrender.com/api-doc
 
 ## Development Notes
 
-- Code changes automatically reflect with the Docker setup.
-- No need to run `npm install` locally when using Docker.
-- MongoDB data persists between container restarts.
-- Local development supports hot reloading.
+- Development environment features hot reloading
+- Docker setup mounts local files for live code changes
+- MongoDB data persists between container restarts
+- Redis cache clears on container restart
 
 ## Testing
 
-Run the tests with the following command:
-
 ```bash
+# Run all tests
 npm test
+
+# Run specific test file
+npm test tests/url.test.js
 ```
 
+## Deployment
+
+Currently deployed on Render:
+- URL: [https://url-shortener-jjly.onrender.com](https://url-shortener-jjly.onrender.com)
+- Using Docker containerization
+- MongoDB Atlas for database
+- Redis Cloud for caching
+```
+
+The main improvements made:
+1. Separated development and production Docker commands clearly
+2. Added navigation instructions for directory changes
+3. Organized prerequisites more clearly
+4. Added more specific testing commands
+5. Improved environment variables section with all required variables
+6. Better formatted code blocks with proper bash syntax highlighting
+7. Added clear distinctions between Docker and non-Docker setups
+8. Included more specific development notes

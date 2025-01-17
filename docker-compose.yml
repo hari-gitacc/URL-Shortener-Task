@@ -3,31 +3,14 @@ services:
     build: .
     ports:
       - "3000:3000"
-    depends_on:
-      - mongodb
-      - redis
     environment:
-      - MONGODB_URI=mongodb://mongodb:27017/url-shortener
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
+      - MONGODB_URI=${MONGODB_URI}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
       - PORT=3000
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
       - JWT_SECRET=${JWT_SECRET}
       - BASE_URL=${BASE_URL}
       - SESSION_SECRET=${SESSION_SECRET}
-
-  mongodb:
-    image: mongo:latest
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongodb_data:/data/db
-
-  redis:
-    image: redis:alpine
-    ports:
-      - "6379:6379"
-
-volumes:
-  mongodb_data:
+    command: npm start
