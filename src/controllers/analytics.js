@@ -69,24 +69,26 @@ const analyticsController = {
 // Track URL Visit
 trackVisit: async (req, urlId) => {
   try {
-    // Better IP address detection
-    const ip = req.headers['x-forwarded-for'] ||
-               req.connection.remoteAddress ||
-               req.socket.remoteAddress ||
-               req.connection.socket?.remoteAddress ||
-               '0.0.0.0';
+    // Extract the IP address from x-forwarded-for (if available) or fallback to other sources.
+    const forwardedFor = req.headers['x-forwarded-for'];
+    const ip = forwardedFor
+      ? forwardedFor.split(',')[0].trim()  // Use only the first IP
+      : req.connection?.remoteAddress ||
+        req.socket?.remoteAddress ||
+        '0.0.0.0';
 
-    // Clean IP address (remove IPv6 prefix if present)
+    // Clean the IP address (remove IPv6 prefix if present)
     const cleanIP = ip.replace(/^.*:/, '');
 
     const userAgent = req.headers['user-agent'];
     const deviceInfo = deviceDetector.parseUserAgent(userAgent);
 
-    // Use a test IP in development if specified
-    const testIP = '8.8.8.8'; // Google's DNS IP for testing
-    const useTestIp = process.env.NODE_ENV === 'development'; // or a dedicated flag like USE_TEST_IP=true
-
+    // Use a test IP for development if configured
+    const testIP = '8.8.8.8'; // Google's DNS for testing
+    const useTestIp = process.env.NODE_ENV === 'development';
     const ipForGeo = useTestIp ? testIP : cleanIP;
+
+    // Lookup geo location data using the cleaned IP
     const geoData = geoip.lookup(ipForGeo);
 
     const visitData = {
@@ -101,19 +103,17 @@ trackVisit: async (req, urlId) => {
         city: geoData.city,
         region: geoData.region,
         timezone: geoData.timezone,
-        ll: geoData.ll // latitude and longitude
+        ll: geoData.ll
       } : null,
       timestamp: new Date()
     };
-
-    console.log(visitData, 'visitData');
-    
 
     await Analytics.create(visitData);
   } catch (error) {
     console.error('Error tracking visit:', error);
   }
 }
+
 
 };
 
