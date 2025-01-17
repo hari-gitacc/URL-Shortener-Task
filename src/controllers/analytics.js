@@ -68,47 +68,53 @@ const analyticsController = {
 
 // Track URL Visit
 trackVisit: async (req, urlId) => {
-    try {
-      // Better IP address detection
-      const ip = req.headers['x-forwarded-for'] || 
-                 req.connection.remoteAddress || 
-                 req.socket.remoteAddress || 
-                 req.connection.socket?.remoteAddress ||
-                 '0.0.0.0';
-  
-      // Clean IP address (remove IPv6 prefix if present)
-      const cleanIP = ip.replace(/^.*:/, '');
-  
-      const userAgent = req.headers['user-agent'];
-      const deviceInfo = deviceDetector.parseUserAgent(userAgent);
-      
-      // Use a test IP for local development
-      const testIP = '8.8.8.8'; // Google's DNS IP for testing
-      const geoData = geoip.lookup(cleanIP === '1' ? testIP : cleanIP);
-  
-      const visitData = {
-        urlId,
-        ipAddress: cleanIP,
-        userAgent,
-        device: deviceInfo.device,
-        os: deviceInfo.os,
-        browser: deviceInfo.browser,
-        location: geoData ? {
-          country: geoData.country,
-          city: geoData.city,
-          region: geoData.region,
-          timezone: geoData.timezone,
-          ll: geoData.ll // latitude and longitude
-        } : null,
-        timestamp: new Date()
-      };
-  
-      console.log('Visit Data:', visitData);
-      await Analytics.create(visitData);
-    } catch (error) {
-      console.error('Error tracking visit:', error);
-    }
+  try {
+    // Better IP address detection
+    const ip = req.headers['x-forwarded-for'] ||
+               req.connection.remoteAddress ||
+               req.socket.remoteAddress ||
+               req.connection.socket?.remoteAddress ||
+               '0.0.0.0';
+
+    // Clean IP address (remove IPv6 prefix if present)
+    const cleanIP = ip.replace(/^.*:/, '');
+
+    const userAgent = req.headers['user-agent'];
+    const deviceInfo = deviceDetector.parseUserAgent(userAgent);
+
+    // Use a test IP in development if specified
+    const testIP = '8.8.8.8'; // Google's DNS IP for testing
+    const useTestIp = process.env.NODE_ENV === 'development'; // or a dedicated flag like USE_TEST_IP=true
+
+    const ipForGeo = useTestIp ? testIP : cleanIP;
+    const geoData = geoip.lookup(ipForGeo);
+
+    const visitData = {
+      urlId,
+      ipAddress: cleanIP,
+      userAgent,
+      device: deviceInfo.device,
+      os: deviceInfo.os,
+      browser: deviceInfo.browser,
+      location: geoData ? {
+        country: geoData.country,
+        city: geoData.city,
+        region: geoData.region,
+        timezone: geoData.timezone,
+        ll: geoData.ll // latitude and longitude
+      } : null,
+      timestamp: new Date()
+    };
+
+    console.log(visitData, 'visitData');
+    
+
+    await Analytics.create(visitData);
+  } catch (error) {
+    console.error('Error tracking visit:', error);
   }
+}
+
 };
 
 module.exports = analyticsController;
