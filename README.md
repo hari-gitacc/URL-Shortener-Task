@@ -117,7 +117,6 @@ SESSION_SECRET=your_session_secret
 IP2LOCATION_KEY=your_key
 ```
 
-```markdown
 ## API Documentation
 
 The API is fully documented using Swagger/OpenAPI specification. Access the interactive Swagger documentation at `/api-docs` when running the server.
