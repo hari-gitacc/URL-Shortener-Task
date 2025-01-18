@@ -16,6 +16,7 @@ const analyticsRoutes = require('./routes/analytics');
 const swaggerDocs = require('./config/swagger');
 const analytics = require('./models/analytics');
 const url = require('./models/url');
+const connectDB = require('./config/db');
 
 // Initialize express app
 const app = express();
@@ -47,14 +48,8 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
-
-
-mongoose.connect(process.env.MONGODB_URI, {
-
-  serverSelectionTimeoutMS: 5000 // Timeout after 5s 
-})
-.then(() => console.log('MongoDB Connected Successfully'))
-.catch(err => console.error('MongoDB Connection Error:', err));
+// Connect to MongoDB
+connectDB()
 
 
 // Session configuration
