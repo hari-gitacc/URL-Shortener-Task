@@ -58,7 +58,7 @@ cd URL-Shortener-Task
 cp .env.example .env
 # Edit .env with your credentials
 
-# Start development environment
+# Start development environment with hot reloading
 docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
 
 # To stop the containers
@@ -93,7 +93,7 @@ npm install
 cp .env.example .env
 # Edit .env with your credentials
 
-# Start development server
+# Start development server 
 npm run dev
 
 # Start production server
