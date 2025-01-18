@@ -5,7 +5,6 @@ const helmet = require('helmet');
 const passport = require('passport');
 const session = require('express-session');
 const swaggerUi = require('swagger-ui-express');
-const mongoose = require('mongoose');
 require('dotenv').config();
 
 
