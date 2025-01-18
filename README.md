@@ -117,6 +117,40 @@ SESSION_SECRET=your_session_secret
 IP2LOCATION_KEY=your_key
 ```
 
+
+Let me help you update the Environment Variables section of your README to include the callback URL information:
+
+## Environment Variables
+
+Create `.env` file from `.env.example`:
+
+```env
+MONGODB_URI=your_mongodb_uri
+REDIS_HOST=your_redis_host
+REDIS_PORT=6379
+PORT=3000
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+JWT_SECRET=your_jwt_secret
+BASE_URL=your_base_url  # e.g., http://localhost:3000 for local, https://your-domain.com for production
+SESSION_SECRET=your_session_secret
+IP2LOCATION_KEY=your_key
+```
+
+### Google OAuth Setup
+
+1. Go to Google Cloud Console
+2. Create a new project or select existing one
+3. Enable Google+ API
+4. Configure OAuth consent screen
+5. Create OAuth 2.0 credentials
+6. Add authorized redirect URI:
+   - Local: `http://localhost:3000/api/auth/google/callback`
+   - Production: `https://url-shortener-jjly.onrender.com/api/auth/google/callback`
+
+Note: Make sure your `BASE_URL` matches your environment (development/production) as the callback URL is constructed using: `${BASE_URL}/api/auth/google/callback`
+
+
 ## API Documentation
 
 The API is fully documented using Swagger/OpenAPI specification. Access the interactive Swagger documentation at `/api-docs` when running the server.

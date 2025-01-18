@@ -7,6 +7,8 @@ const urlController = {
 createShortUrl: async (req, res) => {
     try {
         const { longUrl, customAlias, topic } = req.body;
+        console.log(longUrl, customAlias, topic);
+        
         const userEmail = req.user.email;
 
         // URL creation logic

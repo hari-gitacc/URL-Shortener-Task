@@ -12,6 +12,7 @@
  *         required: true
  *         schema:
  *           type: string
+ *         example: "my-custom-url"
  *     responses:
  *       200:
  *         description: Analytics data
@@ -51,20 +52,16 @@
  *                       uniqueUsers:
  *                         type: number
  *                         example: 25
- *                 deviceType:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       deviceName:
- *                         type: string
- *                         example: "desktop"
- *                       uniqueClicks:
- *                         type: number
- *                         example: 40
- *                       uniqueUsers:
- *                         type: number
- *                         example: 20
+ *       404:
+ *         description: URL not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "URL not found"
  *
  * /api/analytics/topic/{topic}:
  *   get:
@@ -79,6 +76,7 @@
  *         schema:
  *           type: string
  *           enum: [acquisition, activation, retention]
+ *         example: "acquisition"
  *     responses:
  *       200:
  *         description: Topic analytics data
@@ -93,6 +91,17 @@
  *                 uniqueUsers:
  *                   type: number
  *                   example: 150
+ *                 clicksByDate:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       date:
+ *                         type: string
+ *                         example: "2025-01-15"
+ *                       clicks:
+ *                         type: number
+ *                         example: 45
  *                 urls:
  *                   type: array
  *                   items:
@@ -100,10 +109,13 @@
  *                     properties:
  *                       shortUrl:
  *                         type: string
+ *                         example: "my-acquisition-url"
  *                       totalClicks:
  *                         type: number
+ *                         example: 120
  *                       uniqueUsers:
  *                         type: number
+ *                         example: 60
  *
  * /api/analytics/overall:
  *   get:
@@ -128,8 +140,56 @@
  *                 uniqueUsers:
  *                   type: number
  *                   example: 250
+ *                 clicksByDate:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       date:
+ *                         type: string
+ *                         example: "2025-01-15"
+ *                       clicks:
+ *                         type: number
+ *                         example: 100
+ *                 osType:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       osName:
+ *                         type: string
+ *                         example: "Windows"
+ *                       uniqueClicks:
+ *                         type: number
+ *                         example: 200
+ *                       uniqueUsers:
+ *                         type: number
+ *                         example: 100
+ *                 deviceType:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       deviceName:
+ *                         type: string
+ *                         example: "desktop"
+ *                       uniqueClicks:
+ *                         type: number
+ *                         example: 300
+ *                       uniqueUsers:
+ *                         type: number
+ *                         example: 150
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Authentication required"
  */
-
 const express = require('express');
 const router = express.Router();
 const analyticsController = require('../controllers/analytics');
