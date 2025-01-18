@@ -1,6 +1,5 @@
 const swaggerJSDoc = require("swagger-jsdoc");
 const baseUrl = process.env.BASE_URL ;
-console.log(baseUrl);
 
 
 const swaggerOptions = {

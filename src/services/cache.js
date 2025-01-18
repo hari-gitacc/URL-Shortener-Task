@@ -6,7 +6,6 @@ const cacheService = {
     try {
       const client = await redisManager.getClient();
       const data = await client.get(key);
-      console.log(data, 'data');
       
       return data ? JSON.parse(data) : null;
     } catch (error) {

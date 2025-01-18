@@ -47,10 +47,8 @@ const analyticsController = {
   // Overall Analytics
   getOverallAnalytics: async (req, res) => {
     try {
-      console.log(req.user, 'req.user');
       const userEmail = req.user.email;
       const overallStats = await analyticsService.getOverallAnalytics(userEmail);
-      console.log(overallStats);
       res.json(overallStats);
     } catch (error) {
       console.log(error);
@@ -79,11 +77,9 @@ const analyticsController = {
       const testIP = '223.185.22.34'; // Test IP for local development
       const ipForGeo = process.env.NODE_ENV === 'production' ? cleanIP : testIP;
   
-      console.log(ipForGeo, 'ipForGeo');
   
       // Lookup geo location data using the IP2Location API
       const geoData = await getLocationFromIP(ipForGeo);
-      console.log(geoData, 'geoData');
   
       const visitData = {
         urlId,

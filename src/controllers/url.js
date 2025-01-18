@@ -7,7 +7,6 @@ const urlController = {
 createShortUrl: async (req, res) => {
     try {
         const { longUrl, customAlias, topic } = req.body;
-        console.log(longUrl, customAlias, topic);
         
         const userEmail = req.user.email;
 
@@ -44,7 +43,6 @@ createShortUrl: async (req, res) => {
             let url = await cacheService.get(`url:${alias}`);
 
             if (!url) {
-                console.log('url not found in cache');
                 
                 url = await Url.findOne({ shortUrl: alias });
                 if (!url) {
