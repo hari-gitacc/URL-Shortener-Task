@@ -1,4 +1,3 @@
-Here's the formatted and organized README.md file, ready to use:
 
 # Advanced URL Shortener with Analytics
 
@@ -118,17 +117,51 @@ SESSION_SECRET=your_session_secret
 IP2LOCATION_KEY=your_key
 ```
 
+```markdown
 ## API Documentation
 
-Access the API documentation at `/api-docs` when running the server.
+The API is fully documented using Swagger/OpenAPI specification. Access the interactive Swagger documentation at `/api-docs` when running the server.
 
 ### Key Endpoints
 
-- `POST /api/shorten` - Create a short URL
-- `GET /api/shorten/{alias}` - Access the short URL
-- `GET /api/analytics/{alias}` - View URL analytics
-- `GET /api/analytics/topic/{topic}` - View topic analytics
-- `GET /api/analytics/overall` - View overall analytics
+#### URL Operations
+- `POST /api/shorten` 
+  - Create a short URL
+  - Requires authentication
+  - Supports custom aliases and topic categorization
+  - Rate limited (50/hour, 5/minute per user)
+
+- `GET /api/shorten/{alias}` 
+  - Access the short URL
+  - Public endpoint
+  - Tracks analytics automatically
+
+#### Analytics Operations
+- `GET /api/analytics/{alias}`
+  - View detailed URL analytics
+  - Requires authentication
+  - Shows clicks, unique visitors, and geographic data
+
+- `GET /api/analytics/topic/{topic}`
+  - View topic-based analytics
+  - Requires authentication
+  - Topics: acquisition, activation, retention
+
+- `GET /api/analytics/overall`
+  - View overall analytics for all URLs
+  - Requires authentication
+  - Comprehensive statistics and trends
+
+### Swagger UI Features
+- Interactive API testing interface
+- Request/response examples
+- Authentication documentation
+- Schema definitions
+- Rate limit information
+
+Access the full API documentation and testing interface at: 
+
+https://url-shortener-jjly.onrender.com/api-docs
 
 ## Development Notes
 

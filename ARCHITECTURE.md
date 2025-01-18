@@ -1,249 +1,308 @@
-# URL Shortener Architecture Documentation
 
-## Table of Contents
-1. System Overview
-2. Technical Stack
-3. Core Components
-4. Database Design
-5. Security Implementation
-6. Performance Optimizations
-7. Development & Deployment
-8. Scalability Considerations
-9. Monitoring & Maintenance
-10. Future Improvements
-11. API Documentation
-12. Challenges & Solutions
+`ARCHITECTURE.md`:
+```markdown
+# URL Shortener Architecture Documentation
 
 ## 1. System Overview
 
-### High-Level Architecture
-The URL shortener is built as a RESTful API service with:
-- Stateless authentication
-- Distributed caching
-- Asynchronous analytics tracking
-- Rate limiting protection
+### Core Components
+- Node.js/Express backend service
+- MongoDB for data persistence
+- Redis for caching and rate limiting
+- Google OAuth authentication
+- IP2Location.io for geolocation tracking
 
 ### Key Features
 - URL shortening with custom aliases
-- Comprehensive analytics tracking
-- Google OAuth integration
-- Redis-based caching
-- Rate limiting
+- Topic-based URL organization
+- Comprehensive analytics
+- Rate limiting protection
+- Distributed caching
 
-## 2. Technical Stack
+## 2. Database Design
 
-### Backend Framework
-- Node.js with Express.js
-- Reasons:
-  - Fast development
-  - Large ecosystem
-  - Good performance
-  - Easy maintenance
+### Users Collection
+```javascript
+{
+  googleId: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  name: String,
+  picture: String,
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
+}
+```
 
-### Databases
-- **Primary:** MongoDB
-  - Flexible schema
-  - Good performance
-  - Easy scaling
-  - Rich querying
+### URLs Collection
+```javascript
+{
+  userEmail: {   
+    type: String,
+    ref: 'User',
+    required: true
+  },
+  longUrl: {
+    type: String,
+    required: true
+  },
+  shortUrl: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  customAlias: String,
+  topic: {
+    type: String,
+    enum: ['acquisition', 'activation', 'retention'],
+    default: null
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
+}
+```
 
-- **Cache:** Redis
-  - In-memory caching
-  - Rate limiting
-  - Session management
+### Analytics Collection
+```javascript
+{
+  urlId: {
+    type: ObjectId,
+    ref: 'Url',
+    required: true
+  },
+  timestamp: {
+    type: Date,
+    default: Date.now
+  },
+  ipAddress: String,
+  userAgent: String,
+  device: String,
+  os: String,
+  browser: String,
+  location: {
+    ip: String,
+    country_code: String,
+    country_name: String,
+    region_name: String,
+    city_name: String,
+    latitude: Number,
+    longitude: Number,
+    zip_code: String,
+    time_zone: String,
+    asn: String,
+    as: String,
+    is_proxy: Boolean
+  }
+}
+```
+
+## 3. Service Implementations
+
+### Rate Limiting System
+```javascript
+// Hourly limit (50 URLs per hour)
+const hourlyLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 50,
+  keyGenerator: (req) => req.user.email,
+  handler: async (req, res) => {
+    const client = await redisManager.getClient();
+    const key = `ratelimit:${req.user.email}`;
+    await client.incr(key);
+    await client.expire(key, 3600);
+    res.status(429).json({
+      error: 'URL creation limit exceeded. You can create up to 50 URLs per hour.'
+    });
+  }
+});
+
+// Burst limit (5 URLs per minute)
+const burstLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 5,
+  keyGenerator: (req) => req.user.email,
+  handler: async (req, res) => {
+    const client = await redisManager.getClient();
+    const key = `burstlimit:${req.user.email}`;
+    await client.incr(key);
+    await client.expire(key, 60);
+    res.status(429).json({
+      error: 'Please wait a moment before creating more URLs.'
+    });
+  }
+});
+```
+
+### Caching System
+```javascript
+// URL Caching
+const urlCache = {
+  key: (shortUrl) => `url:${shortUrl}`,
+  ttl: 3600, // 1 hour
+};
+
+// Analytics Caching
+const analyticsCache = {
+  key: (shortUrl) => `analytics:${shortUrl}`,
+  ttl: 300, // 5 minutes
+};
+```
+
+### Geolocation System
+```javascript
+const getLocationFromIP = async (ip) => {
+  const BASE_URL = "https://api.ip2location.io/";
+  const params = new URLSearchParams({
+    key: process.env.IP2LOCATION_KEY,
+    ip: ip,
+  });
+  
+  const url = `${BASE_URL}?${params.toString()}`;
+  // Full location data with error handling
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Geolocation error:', error);
+    return null;
+  }
+};
+```
+
+## 4. Docker Configuration
+
+### Development Environment
+```yaml
+services:
+  app:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/url-shortener
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    command: npm run dev
+
+  mongodb:
+    image: mongo:latest
+    volumes:
+      - mongodb_data:/data/db
+
+  redis:
+    image: redis:alpine
+
+volumes:
+  mongodb_data:
+```
+
+### Production Environment
+```yaml
+services:
+  app:
+    build: .
+    environment:
+      - MONGODB_URI=${MONGODB_URI}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    command: npm start
+```
+
+## 5. Error Handling
+
+### API Error Responses
+- 400: Bad Request (Invalid input)
+- 401: Unauthorized (Authentication required)
+- 404: Not Found (URL not found)
+- 429: Too Many Requests (Rate limit exceeded)
+- 500: Internal Server Error
+
+### Error Recovery
+- Redis connection retry
+- MongoDB reconnection strategy
+- IP2Location API fallback
+
+## 6. Security Measures
 
 ### Authentication
 - Google OAuth 2.0
-- JWT tokens
+- JWT token validation
 - Session management
 
-## 3. Core Components
+### API Protection
+- Rate limiting
+- Input validation
+- Request sanitization
 
-### Authentication Service
-- Handles Google OAuth flow
-- Manages JWT tokens
-- Validates sessions
+## 7. Analytics Implementation
 
-### URL Service
-- URL creation and validation
-- Custom alias management
-- Redirection handling
-- Cache management
+### Data Collection
+- IP address tracking
+- User agent parsing
+- Geolocation lookup
+- Device detection
+- Click timestamp recording
 
-### Analytics Service
-- Click tracking
-- Geographic data collection
-- Device/OS detection
-- Data aggregation
+### Data Aggregation
+- 7-day click history
+- Unique visitor counting
+- Geographic distribution
+- OS/Device statistics
+- Topic-based metrics
 
-### Rate Limiting Service
-- Request throttling
-- Burst protection
-- User-based limits
+## 8. Testing Strategy
 
-## 4. Database Design
+### Required Tests
+- URL operations
+- Rate limiting
+- Analytics tracking
+- Authentication flow
+- Cache operations
 
-### MongoDB Collections
-
-#### Users Collection
-```javascript
-{
-  googleId: String,
-  email: String,
-  name: String,
-  createdAt: Date
-}
+### Test Coverage
+- Unit tests for services
+- Integration tests for API
+- Analytics validation
 
 
-URLs Collection
-{
-  userEmail: String,
-  longUrl: String,
-  shortUrl: String,
-  customAlias: String,
-  topic: String,
-  createdAt: Date
-}
+### API Endpoints
 
+#### URL Management
+- `POST /api/shorten` - Create short URL
+- `GET /api/shorten/{alias}` - Access short URL
 
-Analytics Collection
-{
-  urlId: ObjectId,
-  timestamp: Date,
-  ipAddress: String,
-  device: String,
-  os: String,
-  location: {
-    country: String,
-    city: String,
-    region: String
-  }
-}
+#### Analytics
+- `GET /api/analytics/{alias}` - URL analytics
+- `GET /api/analytics/topic/{topic}` - Topic analytics
+- `GET /api/analytics/overall` - Overall analytics
 
-Redis Storage
+### Development Notes
+- Development environment features hot reloading
+- Docker setup mounts local files for live code changes
+- MongoDB data persists between container restarts
+- Redis cache clears on container restart
 
-URL mappings cache
-Rate limiting data
-Session storage
-Analytics cache
+### Testing
+```bash
+# Run tests
+npm test
+```
 
-5. Security Implementation
-Authentication Security
-
-OAuth 2.0 protocol
-JWT with expiration
-Secure session handling
-
-API Security
-
-Rate limiting
-Input validation
-CORS configuration
-Helmet middleware
-
-Data Security
-
-Encrypted connections
-Sanitized inputs
-Validated outputs
-
-6. Performance Optimizations
-Caching Strategy
-
-Short URLs: 1 hour TTL
-Analytics data: 5 minutes TTL
-User sessions: 24 hours TTL
-
-Database Optimizations
-
-Indexed queries
-Connection pooling
-Query optimization
-
-Rate Limiting
-
-50 URLs per hour per user
-5 URLs per minute (burst)
-Redis-based tracking
-
-7. Development & Deployment
-Development Environment
-Local development setup
-Docker containerization
-Environment configuration
-
-Testing Strategy
-
-Unit tests
-Integration tests
-API endpoint tests
-
-Deployment Process
-
-Railway.app hosting
-Environment variables
-Monitoring setup
-
-8. Scalability Considerations
-Current Implementation
-
-Stateless design
-Distributed caching
-Horizontal scaling ready
-
-Future Scaling
-
-Database sharding
-Load balancing
-CDN integration
-
-9. Monitoring & Maintenance
-Error Handling
-
-Centralized error logging
-Error classification
-Recovery procedures
-
-Performance Monitoring
-
-Response times
-Error rates
-Resource usage
-
-10. Future Improvements
-Technical Enhancements
-
-Real-time analytics
-Advanced caching
-Backup strategy
-
-Feature Additions
-
-Custom domains
-API key management
-Advanced analytics
-
-11. API Documentation
-
-Swagger/OpenAPI integration
-Interactive documentation
-Example requests/responses
-
-12. Challenges & Solutions
-Challenge 1: Rate Limiting
-
-Problem: Distributed rate limiting
-Solution: Redis-based implementation
-
-Challenge 2: Analytics Performance
-
-Problem: High write operations
-Solution: Asynchronous tracking
-
-Challenge 3: Cache Management
-
-Problem: Data consistency
-Solution: TTL-based invalidation
-
-Conclusion
-This architecture provides a scalable, maintainable, and secure foundation for the URL shortening service, with room for future growth and improvements.
+### API Documentation
+Access Swagger documentation at `/api-docs` when running the server.
+```
