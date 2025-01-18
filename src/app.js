@@ -37,8 +37,8 @@ app.use(
   })
 );
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? process.env.BASE_URL 
+  origin: process.env.NODE_ENV === 'production'
+    ? process.env.BASE_URL
     : 'http://localhost:3000',
   credentials: true
 }));
@@ -95,9 +95,30 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 3000;
 
+
 if (process.env.NODE_ENV !== 'test') {
-  app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+
+  const server = app.listen(process.env.PORT || 3000, () => {
+    console.log(`Server running on port ${process.env.PORT || 3000}`);
+  });
+
+
+  // Handle graceful shutdown
+  process.on('SIGTERM', () => {
+    console.log('SIGTERM received, shutting down gracefully');
+    server.close(() => {
+      console.log('Process terminated');
+      process.exit(0);
+    });
+  });
+
+  process.on('SIGINT', () => {
+    console.log('SIGINT received, shutting down gracefully');
+    server.close(() => {
+      console.log('Process terminated');
+      process.exit(0);
+    });
   });
 }
+
 module.exports = app;
