@@ -253,11 +253,8 @@ Currently deployed on Render:
 **Solution:** Structured MongoDB schema to efficiently track visits, user agents, and geolocation data while maintaining query performance for analytics endpoints
 
 
-## Important Note About Authentication
+**Important Note on Account Login:**
 
-Hello Team,
-I noticed the **Important Reminder**: *Make sure to sign up for I GOT SKILLS using the same email address you received this email on.*
+Due to the I GOT SKILLS platform's limitation to only support Google authentication, I have registered and completed the assessment using my secondary Google email address, `harisrini777@gmail.com`. This differs from my primary email address associated with my application, `hari.dev@zohomail.in`. Please ensure that this discrepancy does not impact the evaluation of my submission, as both accounts are managed by me.
 
-However, the website only offers a Google login option, and I primarily use Zoho Mail (hari.dev@zohomail.in), where I also receive task-related emails. Is there any way to sign up or link my Zoho Mail account?
-
-Therefore, I have used my Google account (harisrini777@gmail.com) for authentication since Zoho email login is not yet supported. This was necessary to complete and test the authentication functionality of the application.
+Thank you for your understanding.
