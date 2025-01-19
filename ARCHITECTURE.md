@@ -1,6 +1,5 @@
 
 `ARCHITECTURE.md`:
-```markdown
 # URL Shortener Architecture Documentation
 
 ## 1. System Overview
@@ -345,4 +344,3 @@ npm test
 
 ### API Documentation
 Access Swagger documentation at `/api-docs` when running the server.
-```
