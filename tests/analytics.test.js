@@ -71,4 +71,46 @@ describe('Analytics API', () => {
         expect(response.body.totalClicks).toBe(2);
       });
     });
+
+    describe('GET /api/analytics/:alias/locations', () => {
+      it('should return location analytics for a URL', async () => {
+        const response = await request(app)
+          .get(`/api/analytics/${testUrl.shortUrl}/locations`)
+          .set('Authorization', `Bearer ${token}`);
+    
+        // Basic response checks
+        expect(response.status).toBe(200);
+        expect(response.body).toHaveProperty('shortUrl', testUrl.shortUrl);
+        expect(response.body).toHaveProperty('totalLocations');
+        expect(response.body).toHaveProperty('locations');
+    
+        // Check locations array structure
+        expect(Array.isArray(response.body.locations)).toBe(true);
+        if (response.body.locations.length > 0) {
+          const location = response.body.locations[0];
+          expect(location).toHaveProperty('country');
+          expect(location).toHaveProperty('region');
+          expect(location).toHaveProperty('city');
+          expect(location).toHaveProperty('visits');
+          expect(location).toHaveProperty('uniqueVisitors');
+          expect(location).toHaveProperty('lastVisit');
+        }
+      });
+    
+      it('should return 404 for non-existent URL', async () => {
+        const response = await request(app)
+          .get('/api/analytics/non-existent-url/locations')
+          .set('Authorization', `Bearer ${token}`);
+    
+        expect(response.status).toBe(404);
+        expect(response.body).toHaveProperty('error', 'URL not found');
+      });
+    
+      it('should require authentication', async () => {
+        const response = await request(app)
+          .get(`/api/analytics/${testUrl.shortUrl}/locations`);
+    
+        expect(response.status).toBe(401);
+      });
+    });
   });

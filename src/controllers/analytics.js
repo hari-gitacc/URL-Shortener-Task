@@ -97,7 +97,57 @@ const analyticsController = {
     } catch (error) {
       console.error('Error tracking visit:', error);
     }
+  },
+
+getLocationAnalytics: async (req, res) => {
+  try {
+    const { alias } = req.params;
+
+    const url = await Url.findOne({ shortUrl: alias });
+    if (!url) {
+      return res.status(404).json({ error: 'URL not found' });
+    }
+
+    // Get all unique locations for this URL
+    const locations = await Analytics.aggregate([
+      { $match: { urlId: url._id } },
+      {
+        $group: {
+          _id: {
+            country: '$location.country_name',
+            region: '$location.region_name',
+            city: '$location.city_name'
+          },
+          visits: { $sum: 1 },
+          uniqueVisitors: { $addToSet: '$ipAddress' },
+          lastVisit: { $max: '$timestamp' }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          country: '$_id.country',
+          region: '$_id.region',
+          city: '$_id.city',
+          visits: 1,
+          uniqueVisitors: { $size: '$uniqueVisitors' },
+          lastVisit: 1
+        }
+      },
+      { $sort: { visits: -1 } }
+    ]);
+
+    res.json({
+      shortUrl: alias,
+      totalLocations: locations.length,
+      locations: locations
+    });
+
+  } catch (error) {
+    console.error('Error getting location analytics:', error);
+    res.status(500).json({ error: 'Error retrieving location analytics' });
   }
+}
   
 };
 

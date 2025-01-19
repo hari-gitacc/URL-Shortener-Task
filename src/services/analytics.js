@@ -242,7 +242,10 @@ const analyticsService = {
       console.error('Error getting overall analytics:', error);
       throw error;
     }
-  }
+  },
+  
+
+
 };
 
 module.exports = analyticsService;

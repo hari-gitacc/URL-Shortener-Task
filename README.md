@@ -251,3 +251,13 @@ Currently deployed on Render:
 ### 6. Analytics Data Structure
 **Challenge:** Designing an efficient schema for storing and retrieving analytics data  
 **Solution:** Structured MongoDB schema to efficiently track visits, user agents, and geolocation data while maintaining query performance for analytics endpoints
+
+
+## Important Note About Authentication
+
+Hello Team,
+I noticed the **Important Reminder**: *Make sure to sign up for I GOT SKILLS using the same email address you received this email on.*
+
+However, the website only offers a Google login option, and I primarily use Zoho Mail (hari.dev@zohomail.in), where I also receive task-related emails. Is there any way to sign up or link my Zoho Mail account?
+
+Therefore, I have used my Google account (harisrini777@gmail.com) for authentication since Zoho email login is not yet supported. This was necessary to complete and test the authentication functionality of the application.
