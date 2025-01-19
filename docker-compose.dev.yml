@@ -38,7 +38,3 @@ services:
 
 volumes:
   mongodb_data:
-
-
-
-# docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
