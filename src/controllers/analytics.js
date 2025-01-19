@@ -107,7 +107,7 @@ const analyticsController = {
       // Find URL and check ownership
       const url = await Url.findOne({ 
         shortUrl: alias,
-        userEmail: userEmail  // Only get URLs belonging to this user
+        userEmail: userEmail  
       });
   
       if (!url) {

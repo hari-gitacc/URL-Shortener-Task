@@ -185,6 +185,12 @@ The API is fully documented using Swagger/OpenAPI specification. Access the inte
   - Requires authentication
   - Comprehensive statistics and trends
 
+- `GET /api/analytics/{alias}/locations` - List of locations (Additional)
+  - Retrieve detailed geographic analytics for a specific shortened URL based on its alias.
+  - Requires authentication to ensure only the URL owner accesses the analytics.
+  - Aggregates and returns data grouped by country, region, and city, including visit counts, unique visitor metrics.
+
+
 ### Swagger UI Features
 - Interactive API testing interface
 - Request/response examples
