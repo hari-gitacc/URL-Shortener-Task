@@ -16,6 +16,7 @@ const swaggerDocs = require('./config/swagger');
 const analytics = require('./models/analytics');
 const url = require('./models/url');
 const connectDB = require('./config/db');
+const trimParams = require('./middleware/trimParams');
 
 // Initialize express app
 const app = express();
@@ -86,6 +87,12 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/shorten', urlRoutes);
 app.use('/api/analytics', analyticsRoutes);
+
+
+// Test route
+app.get('/test-trim/:param', trimParams, (req, res) => {
+  res.json({ param: req.params.param });
+});
 
 // Error handling middleware
 app.use((err, req, res, next) => {

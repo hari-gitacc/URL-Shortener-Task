@@ -257,14 +257,16 @@
 
 const express = require('express');
 const router = express.Router();
+
 const analyticsController = require('../controllers/analytics');
 const auth = require('../middleware/auth');
+const trimParams = require('../middleware/trimParams');
 
 router.get('/overall', auth, analyticsController.getOverallAnalytics);
-router.get('/:alias', auth, analyticsController.getUrlAnalytics);
+router.get('/:alias',trimParams, auth, analyticsController.getUrlAnalytics);
 router.get('/topic/:topic', auth, analyticsController.getTopicAnalytics);
 
 // Additional endpoint
-router.get('/:alias/locations', auth, analyticsController.getLocationAnalytics);
+router.get('/:alias/locations',trimParams, auth, analyticsController.getLocationAnalytics);
 
 module.exports = router;
